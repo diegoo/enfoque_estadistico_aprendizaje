@@ -1,0 +1,20 @@
+
+names(dataset)
+
+#  [1] "id"       "educ"     "ingfam"   "horastv"  "sexo"     "sexo1"   
+#  [7] "sexo2"    "sitlab"   "ecivil"   "edadboda" "hermanos" "hijos"   
+# [13] "edad"     "titestud" "titpadre" "titmadre" "ingper"   "penacap" 
+# [19] "leyarmas" "legdroga" "vida"     "cachete"  "ciencias" "amantes" 
+# [25] "frecsex"  "indsocec" "relig"
+
+# residuals(fit) 			
+# anova(fit)
+# confint(fit, level=0.95)		# CIs for model parameters 
+# fitted(fit)  				# predicted values
+# vcov(fit)				# covariance matrix for model parameters 
+# influence(fit)			# regression diagnostics
+# layout(matrix(c(1,2,3,4),2,2)) 	# optional 4 graphs/page, diagnostic plots provide checks for heteroscedasticity, normality, and influential observerations.
+# plot(fit)
+# fit1 <- lm(y ~ x1 + x2 + x3 + x4, data=mydata)
+# fit2 <- lm(y ~ x1 + x2)
+# anova(fit1, fit2)			# compare models
