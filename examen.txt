@@ -1,0 +1,90 @@
+1.a. ¿Cuál es la ecuación resultante?
+
+jmp: analyze - fit y by x - scatterplot - fit line.
+kmporh = -197.77 + 1.39kw
+
+1.b. Diseñe un gráfico que incluya la recta y el intervalo de confianza del 95% para la media (con línea punteada o similar). ¿Cuántos puntos quedan fuera de este intervalo?
+
+jmp: linear fit - confidence curves fit
+
+1.c. ¿Estos intervalos de confianza son siempre simétricos?  
+
+sí
+
+1.a. ¿Cuál es valor estimado de KMPORH para un valor de KW igual a 360? Incluya el intervalo de confianza del 95% para la media.
+
+(aplicar la fórmula)
+
+1.b. ¿Cuál es valor estimado de KW para un valor de KMPORH igual a 300? Incluya el intervalo de confianza del 95% para la media.
+
+spss: guardar - no tipificados - media - ver nuevas variables en columnas agregadas - 302|304 es el intervalo
+
+1.c. Realice un gráfico de los residuos (en el eje vertical) contra los valores predichos (en el eje horizontal). ¿Encuentra algún comportamiento?
+
+jmp: linear fit - plot residuals - residual by predicted plot . residuos no estandarizados
+
+spss: plotear zresid contra zpred
+regresión lineal - gráficos - histograma, gráficos de prob. normal.
+
+comportamiento: sí, un embudo (líneas arriba y abajo que van convergiendo hacia el centro). es indicio de que el modelo de regresión está mal (porque la varianza no es constante).
+
+1.d. ¿Encuentra valores anómalos importantes mediante la distancia de Cook? ¿Y utilizando DFBetas?
+
+spss: guardar - distancia de cook, dfbetas
+jmp: analyze - fit model - response - save columns - cook (queda en nueva columna). con estos valores ir a graph builder - plotear cook (y) contra kmporh (x). quitar la línea (smoother - remove)
+
+0.6, 0.3 - fuera de rango, son puntos de influencia
+
+dfbetas sirve cuando hay 3 o 4 predictoras, con más se hace engorroso.
+
+1.e. ¿Cuál es la relación entre el valor del test t para la variable predictora y el valor F del ANOVA?
+
+una es el cuadrado de la otra.
+
+1.f. Compare el ajuste de este modelo con el primer modelo obtenido. 
+
+usar adjusted R-squared. .913
+
+1.g. ¿Qué variables son significativas con un 5% de error? 
+
+kw - kg - hp
+rpm no, porque > 0.05
+
+1.h. ¿Cómo compara el impacto de las variables en el modelo? ¿Cuál es la variable 'más importante' en el modelo? ¿Y la 'menos importante'?
+
+mirar betas estandarizados (tipificados en spss).
+mirar los valores absolutos
+
+1.i. ¿Existe multicolinealidad en el modelo? Indique dos opciones para detectarla y explique los resultados obtenidos. 
+
+opciones: VIF | correlación entre variables (de a dos) | relación entre lambdas (número de condición)
+
+1.j. ¿Qué opciones conoce para resolver la multicolinealidad? Indique por lo menos dos de ellas.
+
+sacar alguna variable | regresión ridge | PLS | PCR
+
+1.k. ¿Cuál es la relación entre VIF y Tolerancia?
+
+una es la inversa de la otra
+
+1.l. ¿Cuál es el mejor modelo considerando dos variables predictoras? ¿Y considerando tres variables predictoras? Considere el criterio Bayesiano y el de Akaike (o el de Akaike corregido) para reponder.
+
+jmp: fit model - stepwise - all models - response - model dialog - personality: stepwise
+
+1.m. Compare el ajuste de este modelo con los modelos anteriores. 
+
+acá es importante transformar continente en variables dummies.
+
+1.n. ¿Qué variables son significativas? 
+
+cont_1 y rpm no son significativas
+
+Utilice ahora interacciones que relacionen las variables RPM y CONTINENTE.
+ 
+1.o. ¿Cambia el valor P (o a 'Prob>F' o la 'Significación') de RPM?
+
+no.
+
+1.p. ¿Tiene sentido o no incluir estas interacciones?
+
+no.
