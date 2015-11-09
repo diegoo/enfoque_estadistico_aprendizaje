@@ -202,27 +202,33 @@ as.data.frame(modelos.subsets.summary.out$outmat)
 
 plot(modelos.subsets, scale = "adjr2", main = "Adjusted R^2")
 
+modelo.5.min <- lm(TARGET_D ~ DemAge, data=datos)
+modelo.2.full.12 <- lm(TARGET_D ~ GiftCnt36 + GiftCntAll + GiftCntCardAll + GiftTimeFirst + GiftTimeLast + GiftAvgLast + GiftAvg36 + GiftAvgAll + DemAge + DemPctVeterans + DemMedHomeValue + DemMedIncome, data=datos)
+modelo.5 <- step(modelo.5.min, scope=list(lower=modelo.5.min, upper=modelo.2.full.12), direction="both")
+summary(modelo.5)
 
+## Call:
+## lm(formula = TARGET_D ~ DemAge + GiftAvgLast + GiftAvg36 + GiftCnt36 + 
+##     GiftTimeFirst + GiftTimeLast, data = datos)
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -77.915  -2.271  -0.771   1.797 156.841 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)    4.7216589  0.9458254   4.992 6.25e-07 ***
+## DemAge        -0.0006444  0.0085888  -0.075 0.940201    
+## GiftAvgLast    0.5122808  0.0234536  21.842  < 2e-16 ***
+## GiftAvg36      0.3146809  0.0275086  11.439  < 2e-16 ***
+## GiftCnt36     -0.3253707  0.0678164  -4.798 1.67e-06 ***
+## GiftTimeFirst -0.0141374  0.0037116  -3.809 0.000142 ***
+## GiftTimeLast   0.0556810  0.0330570   1.684 0.092191 .  
+## ---
+## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+## Residual standard error: 8.071 on 3672 degrees of freedom
+## Multiple R-squared:  0.5496,    Adjusted R-squared:  0.5488 
+## F-statistic: 746.7 on 6 and 3672 DF,  p-value: < 2.2e-16
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## usando r cuadrado ajustado (para comparar modelos con distinta cantidad de variables):
+## con edad: 0.5488
+## sin edad: 0.549
+## son iguales => por parsimonia, preferir modelo sin edad.
