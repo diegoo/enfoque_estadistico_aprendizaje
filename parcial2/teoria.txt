@@ -1,0 +1,28 @@
+El “odd” de un evento (para cierto nivel del factor) es el
+cociente entre la probabilidad que el evento ocurra sobre la
+probabilidad de que no ocurra, para el nivel dado.
+¿Cómo interpretarlos?
+* Odds ratio: OR =1 significa que F no es factor de riesgo.
+* OR > 1 significa que F es un ‘factor dañino’ (depende del
+contexto).
+* Los Odds toman valores de 0 a +infinito, luego log(Odd)
+puede tomar cualquier valor real y puede modelarse (y
+hacer inferencia sobre estos).
+
+
+exp(coeficiente) representa el cambio en los odds al incrementar x en 1 unidad, dejando las demás variables predictoras fijas.
+Si Bi = 0, xi no tiene efecto sobre Y (e^B=1), o sea la chance es la
+misma en ambos niveles de Y.
+• If Bi > 0 , la chance de ocurrir Y=1 crece con xi (e^B>1)
+• If Bi < 0 , la chance de ocurrir Y=1 decrece con xi (e^B<1)
+
+
+* si B es 0.113 => e^B = 1.12 => por cada incremento de 1 en esta predictora, aumenta 12% las odds de la dependiente.
+
+* si B es -0.302 => e^B = 0.74 => por cada incremento de 1 en esta predictora, decrece 26% las odds de la dependiente.
+
+
+* test de wald: H0 es que el coeficiente es 0
+
+
+Distancia de Cook. Una versión adaptada a RL. (Cook>1 sugiere influyente)

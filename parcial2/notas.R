@@ -112,3 +112,76 @@ prob.pred.training <- predict(modelo.final, type = c("response"))
 g.training <- roc(clase ~ prob.pred.training, data = training)
 lines(g.training, col = "blue")
 legend("bottomright", c("training", "testing"), col = c("blue", "red"), lty = 1)
+
+## wald: tester el efecto total de una predictora
+## library(aod)
+## coef(modelo)
+## coeficientes empiezan en 1 con intercept
+## wald.test(b = coef(modelo), Sigma = vcov(modelo), Terms = 4:6)
+
+
+## plot
+##
+## plot(vx,vy,xlab="vx",ylab="Probability of vy") # 
+## g <- glm(vy ~ vx,family=binomial,dat)
+## curve(predict(g,data.frame(vx=x),type="resp"),add=TRUE)
+## points(vy,fitted(g),pch=20)
+
+## para interpretar los coeficientes:
+##
+## exp(coef(modelo))
+## (Intercept)         gre         gpa       rank2       rank3       rank4 
+##      0.0185      1.0023      2.2345      0.5089      0.2618      0.2119
+##
+## con intervalos de confianza
+## exp(cbind(OR = coef(modelo), confint(modelo)))
+##                 OR   2.5 % 97.5 %
+## (Intercept) 0.0185 0.00189  0.167
+## gre         1.0023 1.00014  1.004
+## gpa         2.2345 1.17386  4.324
+## rank2       0.5089 0.27229  0.945
+## rank3       0.2618 0.13164  0.512
+## rank4       0.2119 0.09072  0.471
+## for a one unit increase in gpa, the odds of being admitted to graduate school (versus not being admitted) increase by a factor of 2.2345
+
+
+
+
+
+## selección de variables con all subsets
+##
+## glmulti.lm.out <-
+##     glmulti(bwt ~ age + lwt + race.cat + smoke + preterm + ht + ui + ftv.cat, data = lbw,
+##             level = 1,               # No interaction considered
+##             method = "h",            # Exhaustive approach
+##             crit = "aic",            # AIC as criteria
+##             confsetsize = 5,         # Keep 5 best models
+##             plotty = F, report = F,  # No plot or interim reports
+##             fitfunction = "glm")     # lm function
+##
+## ## Show 5 best models (Use @ instead of $ for an S4 object)
+## glmulti.lm.out@formulas
+##
+## Show result for the best model
+## summary(glmulti.lm.out@objects[[1]])
+
+
+
+## Backward Elimination
+
+## This is the simplest of all variable selection procedures and can be easily implemented without special
+## software. In situations where there is a complex hierarchy, backward elimination can be run manually while taking account of what variables are eligible for removal.
+## 1. Start with all the predictors in the model
+## 2. Remove the predictor with highest p-value greater than αcrit
+## 3. Refit the model and goto 2
+## 4. Stop when all p-values are less than αcrit.
+## The αcrit is sometimes called the “p-to-remove” and does not have to be 5%. If prediction performance
+## is the goal, then a 15-20% cut-off may work best, although methods designed more directly for optimal
+## prediction should be preferred.
+
+## Forward Selection
+##
+## This just reverses the backward method.
+## 1. Start with no variables in the model.
+## 2. For all predictors not in the model, check their p-value if they are added to the model. Choose the one with lowest p-value less than αcrit .
+## 3. Continue until no new predictors can be added.
