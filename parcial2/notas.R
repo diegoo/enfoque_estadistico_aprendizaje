@@ -112,3 +112,41 @@ prob.pred.training <- predict(modelo.final, type = c("response"))
 g.training <- roc(clase ~ prob.pred.training, data = training)
 lines(g.training, col = "blue")
 legend("bottomright", c("training", "testing"), col = c("blue", "red"), lty = 1)
+
+# Cook's distance measures how much an observation influences the overall model or predicted values
+# Studentizided residuals are the residuals divided by their estimated standard deviation as a way to standardized
+# Bonferroni test to identify outliers
+# Hat-points identify influential observations (have a high impact on the predictor variables)
+
+# cook's distance: identify D values > 4/(n-k-1) (n observations, k parameters)
+
+cook.cutoff <- 4 / ((nrow(mtcars) - length(fit$coefficients) - 2)) 
+plot(modelo.final, which = 4, main = "distancia de Cook", cook.levels = cook.cutoff)
+
+# influencers
+
+influencePlot(modelo.final, labels, id.method = "noteworthy", main = "observaciones influyentes", sub = "tamaño del círculo proporcional a distancia de Cook", xlab="valores de y-sombrero", ylab="residuos estandarizados")
+
+##         StudRes         Hat     CookD
+## 927         NaN 1.000000000       NaN
+## 355 -0.02672462 0.999739101 0.5513673
+## 919  3.66581632 0.001890978 0.3279243
+
+## identificar los 5 que tienen más leverage
+
+influenceIndexPlot(modelo.final, id.n=5)
+
+## leverage
+## leveragePlots(fit)
+
+# outliers
+
+outlierTest(modelo.final) # Bonferonni p-value for most extreme obs
+
+## No Studentized residuals with Bonferonni p < 0.05
+## Largest |rstudent|:
+##                rstudent unadjusted p-value Bonferonni p
+## Toyota Corolla  2.51597            0.01838      0.58816
+
+## qq plot for studentized residuals
+qqPlot(fit, main="QQ Plot")
