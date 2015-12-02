@@ -113,6 +113,7 @@ g.training <- roc(clase ~ prob.pred.training, data = training)
 lines(g.training, col = "blue")
 legend("bottomright", c("training", "testing"), col = c("blue", "red"), lty = 1)
 
+<<<<<<< HEAD
 # Cook's distance measures how much an observation influences the overall model or predicted values
 # Studentizided residuals are the residuals divided by their estimated standard deviation as a way to standardized
 # Bonferroni test to identify outliers
@@ -150,3 +151,126 @@ outlierTest(modelo.final) # Bonferonni p-value for most extreme obs
 
 ## qq plot for studentized residuals
 qqPlot(fit, main="QQ Plot")
+=======
+## wald: tester el efecto total de una predictora
+## library(aod)
+## coef(modelo)
+## coeficientes empiezan en 1 con intercept
+## wald.test(b = coef(modelo), Sigma = vcov(modelo), Terms = 4:6)
+
+
+## plot
+##
+## plot(vx,vy,xlab="vx",ylab="Probability of vy") # 
+## g <- glm(vy ~ vx,family=binomial,dat)
+## curve(predict(g,data.frame(vx=x),type="resp"),add=TRUE)
+## points(vy,fitted(g),pch=20)
+
+## para interpretar los coeficientes:
+##
+## exp(coef(modelo))
+## (Intercept)         gre         gpa       rank2       rank3       rank4 
+##      0.0185      1.0023      2.2345      0.5089      0.2618      0.2119
+##
+## con intervalos de confianza
+## exp(cbind(OR = coef(modelo), confint(modelo)))
+##                 OR   2.5 % 97.5 %
+## (Intercept) 0.0185 0.00189  0.167
+## gre         1.0023 1.00014  1.004
+## gpa         2.2345 1.17386  4.324
+## rank2       0.5089 0.27229  0.945
+## rank3       0.2618 0.13164  0.512
+## rank4       0.2119 0.09072  0.471
+## for a one unit increase in gpa, the odds of being admitted to graduate school (versus not being admitted) increase by a factor of 2.2345
+
+
+
+
+
+## selección de variables con all subsets
+##
+## glmulti.lm.out <-
+##     glmulti(bwt ~ age + lwt + race.cat + smoke + preterm + ht + ui + ftv.cat, data = lbw,
+##             level = 1,               # No interaction considered
+##             method = "h",            # Exhaustive approach
+##             crit = "aic",            # AIC as criteria
+##             confsetsize = 5,         # Keep 5 best models
+##             plotty = F, report = F,  # No plot or interim reports
+##             fitfunction = "glm")     # lm function
+##
+## ## Show 5 best models (Use @ instead of $ for an S4 object)
+## glmulti.lm.out@formulas
+##
+## Show result for the best model
+## summary(glmulti.lm.out@objects[[1]])
+
+
+
+## Backward Elimination
+
+## This is the simplest of all variable selection procedures and can be easily implemented without special
+## software. In situations where there is a complex hierarchy, backward elimination can be run manually while taking account of what variables are eligible for removal.
+## 1. Start with all the predictors in the model
+## 2. Remove the predictor with highest p-value greater than αcrit
+## 3. Refit the model and goto 2
+## 4. Stop when all p-values are less than αcrit.
+## The αcrit is sometimes called the “p-to-remove” and does not have to be 5%. If prediction performance
+## is the goal, then a 15-20% cut-off may work best, although methods designed more directly for optimal
+## prediction should be preferred.
+
+## Forward Selection
+##
+## This just reverses the backward method.
+## 1. Start with no variables in the model.
+## 2. For all predictors not in the model, check their p-value if they are added to the model. Choose the one with lowest p-value less than αcrit .
+## 3. Continue until no new predictors can be added.
+
+
+
+
+
+> data[8452,caso]
+       caso AAGE ACLSWKR_C ADTIND_C ADTOCC_C AHGA_C AHRSPAY AHSCOL_C AMARITL_C
+ 167842   65         5        1        1     10       0        3         3
+ AMJIND_C AMJOCC_C ARACE_C AREORGN_C ASEX_C AUNMEM_C AUNTYPE_C AWKSTAT_C
+        2       12       5         9      M        9         6         1
+ CAPGAIN CAPLOSS DIVVAL FILESTAT_C GRINREG_C GRINST_C HHDFMX_C HHDREL_C
+   99999       0   7500          4         6        0        1        5
+ MIGMTR1_C MIGMTR3_C MIGMTR4_C MIGSAME_C MIGSUN_C NOEMP PARENT_C PEFNTVTY_C
+         6         7         8         1        9     1        9          2
+ PEMNTVTY_C PENATVTY_C PRCITSHP_C SEOTR_C VETQVA_C VETYN_C WKSWORK Clase
+          2          2          5       2        9       2      52     0
+ AMJOCC_C_061214 AMJOCC_C_030810 ADTOCC_C_0203
+               1               0             0
+> data[9223,]
+   caso AAGE ACLSWKR_C ADTIND_C ADTOCC_C AHGA_C AHRSPAY AHSCOL_C AMARITL_C
+ 183334   37         9        4        5     10       0        3         3
+ AMJIND_C AMJOCC_C ARACE_C AREORGN_C ASEX_C AUNMEM_C AUNTYPE_C AWKSTAT_C
+        7       15       5         1      F        9         6         3
+ CAPGAIN CAPLOSS DIVVAL FILESTAT_C GRINREG_C GRINST_C HHDFMX_C HHDREL_C
+   99999       0      0          3         6        0        1        5
+ MIGMTR1_C MIGMTR3_C MIGMTR4_C MIGSAME_C MIGSUN_C NOEMP PARENT_C PEFNTVTY_C
+         1         1         1         9        8     0        9          2
+ PEMNTVTY_C PENATVTY_C PRCITSHP_C SEOTR_C VETQVA_C VETYN_C WKSWORK Clase
+          2          2          5       0        9       2       0     0
+ AMJOCC_C_061214 AMJOCC_C_030810 ADTOCC_C_0203
+               0               0             0
+
+
+9223
+8452
+
+testing_sin_clase <- testing[,-41]
+predicciones <- predict(modelo.fw.recodificado, testing_sin_clase, type = c("response"))
+predicciones_02 <- round(predicciones,2)
+predicciones_02_ordenadas_25_porciento <- sort(predicciones_02)[3379:4503]
+length(which(predicciones_02_ordenadas_25_porciento >= 0.5))
+
+
+
+
+
+cutoff <- 4 / (nrow(data) - length(modelo.fw.recodificado$coefficients) - 2)
+plot(modelo.fw.recodificado, which=4, cook.levels=cutoff)
+
+influencePlot(modelo.fw.recodificado, id.method="identify")
