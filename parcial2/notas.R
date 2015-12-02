@@ -185,3 +185,53 @@ legend("bottomright", c("training", "testing"), col = c("blue", "red"), lty = 1)
 ## 1. Start with no variables in the model.
 ## 2. For all predictors not in the model, check their p-value if they are added to the model. Choose the one with lowest p-value less than αcrit .
 ## 3. Continue until no new predictors can be added.
+
+
+
+
+
+> data[8452,caso]
+       caso AAGE ACLSWKR_C ADTIND_C ADTOCC_C AHGA_C AHRSPAY AHSCOL_C AMARITL_C
+ 167842   65         5        1        1     10       0        3         3
+ AMJIND_C AMJOCC_C ARACE_C AREORGN_C ASEX_C AUNMEM_C AUNTYPE_C AWKSTAT_C
+        2       12       5         9      M        9         6         1
+ CAPGAIN CAPLOSS DIVVAL FILESTAT_C GRINREG_C GRINST_C HHDFMX_C HHDREL_C
+   99999       0   7500          4         6        0        1        5
+ MIGMTR1_C MIGMTR3_C MIGMTR4_C MIGSAME_C MIGSUN_C NOEMP PARENT_C PEFNTVTY_C
+         6         7         8         1        9     1        9          2
+ PEMNTVTY_C PENATVTY_C PRCITSHP_C SEOTR_C VETQVA_C VETYN_C WKSWORK Clase
+          2          2          5       2        9       2      52     0
+ AMJOCC_C_061214 AMJOCC_C_030810 ADTOCC_C_0203
+               1               0             0
+> data[9223,]
+   caso AAGE ACLSWKR_C ADTIND_C ADTOCC_C AHGA_C AHRSPAY AHSCOL_C AMARITL_C
+ 183334   37         9        4        5     10       0        3         3
+ AMJIND_C AMJOCC_C ARACE_C AREORGN_C ASEX_C AUNMEM_C AUNTYPE_C AWKSTAT_C
+        7       15       5         1      F        9         6         3
+ CAPGAIN CAPLOSS DIVVAL FILESTAT_C GRINREG_C GRINST_C HHDFMX_C HHDREL_C
+   99999       0      0          3         6        0        1        5
+ MIGMTR1_C MIGMTR3_C MIGMTR4_C MIGSAME_C MIGSUN_C NOEMP PARENT_C PEFNTVTY_C
+         1         1         1         9        8     0        9          2
+ PEMNTVTY_C PENATVTY_C PRCITSHP_C SEOTR_C VETQVA_C VETYN_C WKSWORK Clase
+          2          2          5       0        9       2       0     0
+ AMJOCC_C_061214 AMJOCC_C_030810 ADTOCC_C_0203
+               0               0             0
+
+
+9223
+8452
+
+testing_sin_clase <- testing[,-41]
+predicciones <- predict(modelo.fw.recodificado, testing_sin_clase, type = c("response"))
+predicciones_02 <- round(predicciones,2)
+predicciones_02_ordenadas_25_porciento <- sort(predicciones_02)[3379:4503]
+length(which(predicciones_02_ordenadas_25_porciento >= 0.5))
+
+
+
+
+
+cutoff <- 4 / (nrow(data) - length(modelo.fw.recodificado$coefficients) - 2)
+plot(modelo.fw.recodificado, which=4, cook.levels=cutoff)
+
+influencePlot(modelo.fw.recodificado, id.method="identify")
