@@ -1,0 +1,258 @@
+
+* Elastic Net en R
+
+
+El dataset de HIV tiene 704 observaciones, donde cada registro tiene 208 variables predictoras (binarias, 1/0). Estrictamente hablando no es el caso de p > n, pero p es relativamente grande.
+La variable dependente es numérica y muestra el grade de cambio en susceptibilidad ante drogas antivirales.
+
+--------------------------------------------------------------------------------
+
+install.packages("glmnet")
+library(glmnet)
+load("hiv.rda")
+
+dim(hiv.train$x)                                                                        
+# [1] 704 208										
+
+head(hiv.train[[1]], 1)
+#      p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 p13 p14 p15 p16 p17 p18 p19 p20 p21
+# [1,]  1  1  1  1  1  1  1  1  1   1   1   1   1   1   1   1   1   1   1   1   1
+# (...)
+#      p230 p231 p232 p233 p234 p235 p236 p237 p238 p239 p240
+# [1,]    0    0    0    0    0    0    0    0    0    0    0
+
+head(hiv.train[[2]], 1)
+# [1] 2.30103
+
+--------------------------------------------------------------------------------
+
+La función 'glmnet' es genérica, y permite armar distintos modelos con penalización, según el parámetro 'alpha'.
+
+En los plots, el eje x es el lambda elegido, y el y es el valor del coeficiente. Cada curva es un coeficiente, y representa los valores que asume a medida que va cambiando la norma del vector de variables del modelo. El eje superior indice la cantidad de coeficientes no nulos para cada nivel de lambda. 
+
+--------------------------------------------------------------------------------
+
+modelo_ridge <- glmnet(hiv.train$x, hiv.train$y, alpha = 0)
+plot(modelo_ridge, label = TRUE)
+
+# (modelo_ridge.png)
+
+modelo_lasso <- glmnet(hiv.train$x, hiv.train$y, alpha = 1)
+plot(modelo_lasso, label = TRUE)
+
+# (modelo_lasso.png)
+
+--------------------------------------------------------------------------------
+
+A medida que baja lambda en glmnet, aumenta la cantidad de variables que se incluyen en el modelo. 'Df' (grados de libertad) es la cantidad de variables activas (o sea, con coeficiente no 0). Acá glmnet seleccionó 97 variables con el parámetro alpha default. 
+
+--------------------------------------------------------------------------------
+
+modelo <- glmnet(hiv.train$x, hiv.train$y)
+modelo
+
+# Call:  glmnet(x = hiv.train$x, y = hiv.train$y) 
+#        Df   %Dev    Lambda
+#  [1,]   0 0.0000 0.9885000
+#  [2,]   1 0.1545 0.9007000
+#  [3,]   1 0.2827 0.8207000
+#  [4,]   1 0.3891 0.7478000
+#  [5,]   1 0.4775 0.6813000
+#  [6,]   1 0.5509 0.6208000
+#  [7,]   1 0.6118 0.5656000
+#  (...)
+#  [94,] 196 0.9703 0.0001727
+#  [95,] 197 0.9703 0.0001574
+#  [96,] 200 0.9705 0.0001434
+#  [97,] 200 0.9705 0.0001307
+
+# ver coeficientes para un valor dado de lambda
+coef(modelo, s = 0.1) 
+
+--------------------------------------------------------------------------------
+
+Se puede usar cross-validation y dejar que glmnet itere hasta elegir la mejor penalización. El modelo resultante guarda el lambda que da el error mínimo, y el lambda que da el modelo más regularizado con un error dentro de una desviación del mínimo.
+
+--------------------------------------------------------------------------------
+
+cv.modelo <- cv.glmnet(hiv.train$x, hiv.train$y)                                          
+
+cv.modelo$lambda.min
+# [1] 0.01136518
+
+cv.modelo$lambda.1se
+# [1] 0.02392261
+
+coef(cv.modelo, s = cv.modelo$lambda.min)
+
+# 209 x 1 sparse Matrix of class "dgCMatrix"
+#                        1
+# (Intercept)  1.255203e-01
+# p1           .           
+# p2           .           
+# p3           .           
+# p4           .           
+# p5           .           
+# p6           .           
+# p7           .           
+# p8           .           
+# p9           .           
+# p10          .           
+# p11          .           
+# p12          .           
+# p13          .           
+# p14          .           
+# p15          .           
+# p16          .           
+# p17          .           
+# p18          .           
+# p19          .           
+# p20          .           
+# p21          1.450258e-03
+# p22          .           
+# p23          .           
+# p24          .           
+# p25          .           
+# p26          .           
+# p27          .           
+# p28          .           
+# p29          .           
+# p30          .           
+# p31          .           
+# p32          .           
+# p33          4.952289e-02
+# (...)        .
+# p240         .
+
+--------------------------------------------------------------------------------
+
+Si ploteamos el modelo, se puede ver el error para cada nivel de lambda
+
+--------------------------------------------------------------------------------
+
+plot(cv.modelo)
+
+# modelo_EN_error_vs_lambda.png
+
+--------------------------------------------------------------------------------
+
+Para ver la mejora que se obtuvo al generar el modelo por cross-validation (en rojo), superponemos los errores de las predicciones del modelo original (en azul).
+
+En el plot de devianza explicada, se ve el overfitting a la derecha.
+
+--------------------------------------------------------------------------------
+
+predicciones <- predict(modelo, hiv.test$x)
+error <- apply((predicciones - hiv.test$y)^2, 2, mean)
+points(log(modelo$lambda), error, col="blue", pch="*")
+legend("topleft",legend=c("10 fold CV","Test"),pch="*",col=c("red","blue"))
+
+# modelo_vs_modelo_cross_validation.png
+
+# devianza.png
+--------------------------------------------------------------------------------
+
+Fuentes:
+
+# Hastie explicando glmnet: https://www.youtube.com/watch?v=BU2gjoLPfDc
+# Artículo original sobre HIV: http://www.pnas.org/content/103/46/17355.full.pdf
+
+--------------------------------------------------------------------------------
+
+* Elastic Net en Python
+
+(Requiere los paquetes scipy & sklearn)
+
+Exportamos el dataset de HIV a .csv desde su formato original de .RData y lo cargamos a una matrices de numpy, separando en training y test.
+
+--------------------------------------------------------------------------------
+
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn import datasets, linear_model
+from sklearn.metrics import r2_score
+
+hiv_train_x = np.genfromtxt('hiv.train.x.csv', delimiter=",")
+hiv_train_y = np.genfromtxt('hiv.train.y.csv', delimiter=",")
+hiv_test_x = np.genfromtxt('hiv.test.x.csv', delimiter=",")
+hiv_test_y = np.genfromtxt('hiv.test.y.csv', delimiter=",")
+
+hiv_train_x.shape
+# (704, 208)
+
+# una observación de ejemplo
+
+hiv_train_x[0]
+# array([ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,
+#         1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,
+#         1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  0.,  0.,
+#         0.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+#         0.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  1.,
+#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.])
+
+hiv_train_y.shape
+# (704,)
+
+# la variable de respuesta
+
+hiv_train_y[0]
+# 2.30102999566
+
+--------------------------------------------------------------------------------
+
+En sklearn, el parámetro 'l1_ratio' es un número entre 0 y 1: 0 penaliza con L2, 1 penaliza con L1, y 0 < 'l1_ratio' < 1 combina L1 y L2. Si se le pasa una lista de números, elige el mejor por cross-validation. La lista puede tener valores más cerca de 1 (Lasso) o 0 (Ridge).
+
+'l1_ratio' es el alpha de 'glmnet'. El otro parámetro que acepta sklearn es 'alpha' (es el lambda de 'glmnet').
+
+--------------------------------------------------------------------------------
+
+alpha = 0.1
+l1_ratio = 0.7
+
+en = ElasticNet(alpha = alpha, l1_ratio = l1_ratio)
+en_model = en.fit(hiv_train_x, hiv_train_y)
+predicciones = en_model.predict(hiv_test_x)
+
+--------------------------------------------------------------------------------
+
+El paquete sklearn.linear_modelo permite armar todos los modelos: Lineal, Ridge, Lasso y Elastic Net. Los modelos con constructor 'CV' definen sus parámetros mediante cross-validation.
+
+Aplicamos algunos y los comparamos usando la función score(), que devuelve la varianza explicada (score=1 es óptimo); Elastic Net ganó cuando le pasamos un vector de 'l1_ratio' más cercano a 1 (Lasso).
+
+--------------------------------------------------------------------------------
+
+l = linear_model.LinearRegression()
+l_model = l.fit(hiv_train_x, hiv_train_y)
+y_pred_l_model = l_model.predict(hiv_test_x)
+r2_score_l_model = r2_score(hiv_test_y, y_pred_l_model)
+
+r2_score_l_model
+# 0.88868424783910593
+
+lassocv = linear_model.LassoCV()
+lassocv_model = lassocv.fit(hiv_train_x, hiv_train_y)
+y_pred_lassocv = lassocv_model.predict(hiv_test_x)
+r2_score_lassocv = r2_score(hiv_test_y, y_pred_lassocv)
+
+r2_score_lassocv
+# 0.93820094210822402
+
+enetcv = linear_model.ElasticNetCV(l1_ratio=[.5,.6,.7,.8,.9,1])
+enetcv_model = enetcv.fit(hiv_train_x, hiv_train_y)
+y_pred_enetcv = enetcv_model.predict(hiv_test_x)
+r2_score_enetcv = r2_score(hiv_test_y, y_pred_enetcv)
+
+r2_score_enetcv
+# 0.93825334982548758
+
+--------------------------------------------------------------------------------

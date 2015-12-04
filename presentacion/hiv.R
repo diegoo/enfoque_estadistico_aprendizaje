@@ -4,7 +4,7 @@ load("hiv.rda")
 class(hiv.train)                                                                        # The data are stored as a list
 names(hiv.train)                                                                        # The names of the list elements are x and y
 dim(hiv.train$x)                                                                        # 704 observaciones
-											# predictoras : 208 variables (binarias, 1/0)
+[1] 704 208											# predictoras : 208 variables (binarias, 1/0)
 											# dependiente: cambios en susceptibilidad a drogas antivirales
 head(hiv.train[[1]])
 head(hiv.train[[2]])                                                                    
@@ -31,16 +31,17 @@ cv.modelo <- cv.glmnet(hiv.train$x, hiv.train$y)                                
 plot(cv.modelo, label = TRUE)                                                             # MSE vs lambda
 cv.modelo
 
-cv.modelo$lambda.min # ver el lambda que dé el error mínimo 
-cv.modelo$lambda.lse # ver el lambda que dé el modelo más regularizado, con un error dentro de una desviación del mínimo 
+# ver el lambda que dé el error mínimo
+# ver el lambda que dé el modelo más regularizado, con un error dentro de una desviación del mínimo
+
+cv.modelo$lambda.min 
+cv.modelo$lambda.lse 
 
 coef(cv.modelo, s = cv.modelo$lambda.min)
 
-# Second vertical line is one sd from mse: indicates a smaller model
-# is "almost as good" as the minimal mse model
+predicciones <- predict(modelo, hiv.test$x)
+error <- apply((predicciones - hiv.test$y)^2, 2, mean)
 
-tpred <- predict(modelo, hiv.test$x)
-mte <- apply((tpred - hiv.test$y)^2, 2, mean)
 points(log(modelo$lambda), mte, col="blue", pch="*")
 legend("topleft",legend=c("10 fold CV","Test"),pch="*",col=c("red","blue"))
 plot(cv.modelo, xvar="lambda")
